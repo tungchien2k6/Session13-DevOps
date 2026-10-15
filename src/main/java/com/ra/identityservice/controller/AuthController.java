@@ -21,4 +21,10 @@ public class AuthController {
         UserResponse response = authService.register(request);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/test-token")
+    public ResponseEntity<String> testToken(@RequestParam String username) {
+        String token = authService.generateTestToken(username);
+        return ResponseEntity.ok(token);
+    }
 }

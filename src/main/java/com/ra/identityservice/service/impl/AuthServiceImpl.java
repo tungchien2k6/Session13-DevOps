@@ -5,6 +5,7 @@ import com.ra.identityservice.dto.response.UserResponse;
 import com.ra.identityservice.entity.User;
 import com.ra.identityservice.repository.UserRepository;
 import com.ra.identityservice.service.AuthService;
+import com.ra.identityservice.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -40,5 +43,13 @@ public class AuthServiceImpl implements AuthService {
                 .username(savedUser.getUsername())
                 .role(savedUser.getRole())
                 .build();
+    }
+
+    @Override
+    public String generateTestToken(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng!"));
+
+        return jwtUtil.generateToken(user);
     }
 }

@@ -1,11 +1,14 @@
 package com.ra.identityservice.service.impl;
 
+import com.ra.identityservice.dto.request.LoginRequest;
 import com.ra.identityservice.dto.request.RegisterRequest;
+import com.ra.identityservice.dto.response.AuthResponse;
 import com.ra.identityservice.dto.response.UserResponse;
 import com.ra.identityservice.entity.User;
 import com.ra.identityservice.repository.UserRepository;
 import com.ra.identityservice.service.AuthService;
 import com.ra.identityservice.util.JwtUtil;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +45,21 @@ public class AuthServiceImpl implements AuthService {
                 .id(savedUser.getId())
                 .username(savedUser.getUsername())
                 .role(savedUser.getRole())
+                .build();
+    }
+
+    @Override
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new BadCredentialsException("Bad credentials"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Bad credentials");
+        }
+
+        String token = jwtUtil.generateToken(user);
+        return AuthResponse.builder()
+                .token(token)
                 .build();
     }
 

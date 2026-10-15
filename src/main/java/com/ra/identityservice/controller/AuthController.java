@@ -1,5 +1,7 @@
 package com.ra.identityservice.controller;
 
+import com.ra.identityservice.dto.response.AuthResponse;
+import com.ra.identityservice.dto.request.LoginRequest;
 import com.ra.identityservice.dto.request.RegisterRequest;
 import com.ra.identityservice.dto.response.UserResponse;
 import com.ra.identityservice.service.AuthService;
@@ -19,6 +21,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
         UserResponse response = authService.register(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 
